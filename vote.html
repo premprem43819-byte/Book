@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071523">
+  <meta name="description" content="Sri Sawdamman Infra tax invoice app with GST calculation, auto-save, print, PDF, history and offline support.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Sri Sawdamman Infra — Invoice Pro</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="vote.css">
+  <script src="vote.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#invoiceWorkspace">Skip to invoice</a>
+
+  <div class="ambient ambient-a" aria-hidden="true"></div>
+  <div class="ambient ambient-b" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <header class="app-header">
+    <div class="brand-block">
+      <div class="brand-mark" aria-hidden="true">SSI</div>
+      <div class="brand-copy">
+        <strong>Sri Sawdamman Infra</strong>
+        <span>Invoice Pro</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="save-indicator" id="saveIndicator" role="status" aria-live="polite">
+        <span class="status-dot" id="statusDot" aria-hidden="true"></span>
+        <span id="statusText">Ready</span>
+      </div>
+      <button class="icon-button" id="installButton" type="button" hidden aria-label="Install app" title="Install app">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+      </button>
+      <button class="icon-button" id="themeButton" type="button" aria-label="Switch theme" title="Switch theme">
+        <svg class="theme-icon theme-icon-sun" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+        <svg class="theme-icon theme-icon-moon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 15.4A8.5 8.5 0 0 1 8.6 4 8.5 8.5 0 1 0 20 15.4Z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="app-shell" id="invoiceWorkspace">
+    <section class="dashboard" aria-label="Invoice summary">
+      <div class="metric-card">
+        <span>Invoice</span>
+        <strong id="metricInvoice">Not numbered</strong>
+      </div>
+      <div class="metric-card">
+        <span>Items</span>
+        <strong id="metricItems">0</strong>
+      </div>
+      <div class="metric-card metric-total">
+        <span>Net total</span>
+        <strong id="metricTotal">₹0.00</strong>
+      </div>
+      <div class="dashboard-actions">
+        <button class="soft-button" id="historyButton" type="button">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8m0-5v5h5"/><path d="M12 7v5l3 2"/></svg>
+          History
+        </button>
+        <button class="soft-button" id="newInvoiceButton" type="button">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6Z"/><path d="M14 3v4h4M9 12h6m-3-3v6"/></svg>
+          New
+        </button>
+      </div>
+    </section>
+
+    <article class="invoice-card" aria-label="Tax invoice editor">
+      <header class="invoice-banner">
+        <div>
+          <p class="eyebrow">Cash / Credit Bill</p>
+          <h1>Tax Invoice</h1>
+        </div>
+        <div class="banner-pill" id="invoiceTypeBadge">Intra-state GST</div>
+      </header>
+
+      <section class="identity-grid invoice-section">
+        <div class="company-panel">
+          <label class="floating-field company-name-field">
+            <span>Company name</span>
+            <input data-field="companyName" value="Sri Sawdamman Infra" autocomplete="organization" required>
+          </label>
+          <label class="floating-field">
+            <span>Business description</span>
+            <input data-field="companyTag" value="Paver Block & Civil Works">
+          </label>
+          <label class="floating-field">
+            <span>Company address</span>
+            <textarea data-field="companyAddress" rows="4" autocomplete="street-address">7/115, Kendaigoundanur,
+Sullerumbu, Kendaigoundanur,
+Dindigul, Tamil Nadu - 624710</textarea>
+          </label>
+        </div>
+
+        <div class="detail-panel">
+          <label class="field-row">
+            <span>GSTIN</span>
+            <input data-field="gstin" id="gstinInput" value="33QNWPS9493A1ZW" maxlength="15" autocapitalize="characters" spellcheck="false" aria-describedby="gstinHelp">
+          </label>
+          <small class="field-help" id="gstinHelp">15-character GST identification number</small>
+          <label class="field-row">
+            <span>Cell No.</span>
+            <input data-field="phone" value="7904689983 / 6369477188" inputmode="tel" autocomplete="tel">
+          </label>
+          <label class="field-row">
+            <span>Email</span>
+            <input data-field="email" type="email" placeholder="Optional email" autocomplete="email">
+          </label>
+          <label class="field-row">
+            <span>State</span>
+            <input data-field="state" value="Tamil Nadu, Code: 33">
+          </label>
+        </div>
+      </section>
+
+      <section class="meta-grid invoice-section">
+        <div class="meta-card">
+          <div class="section-title-row">
+            <h2>Invoice details</h2>
+            <button class="text-button" id="generateInvoiceButton" type="button">Generate number</button>
+          </div>
+          <div class="form-grid two-columns">
+            <label class="floating-field">
+              <span>Invoice number</span>
+              <input data-field="invoiceNo" id="invoiceNoInput" placeholder="Example: SSI-2026-001" required>
+            </label>
+            <label class="floating-field">
+              <span>Invoice date</span>
+              <input data-field="invoiceDate" type="date" required>
+            </label>
+          </div>
+        </div>
+        <div class="meta-card">
+          <h2>Order details</h2>
+          <div class="form-grid two-columns">
+            <label class="floating-field">
+              <span>Buyer's order number</span>
+              <input data-field="orderNo" placeholder="Optional">
+            </label>
+            <label class="floating-field">
+              <span>Order date</span>
+              <input data-field="orderDate" type="date">
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="party-grid invoice-section">
+        <div class="party-card">
+          <div class="section-title-row">
+            <h2>Buyer (Bill To)</h2>
+            <span class="optional-label">Editable text</span>
+          </div>
+          <label class="sr-only" for="buyerInput">Buyer name, address and GSTIN</label>
+          <textarea class="large-input" id="buyerInput" data-field="buyer" rows="6" placeholder="Type buyer name, full address, GSTIN and state here"></textarea>
+        </div>
+        <div class="party-card">
+          <div class="section-title-row">
+            <h2>Consignee / Ship To</h2>
+            <button class="text-button" id="copyBuyerButton" type="button">Copy buyer</button>
+          </div>
+          <label class="sr-only" for="consigneeInput">Consignee or delivery address</label>
+          <textarea class="large-input" id="consigneeInput" data-field="consignee" rows="6" placeholder="Type delivery name and full site address here"></textarea>
+        </div>
+      </section>
+
+      <section class="items-section invoice-section">
+        <div class="section-title-row items-title-row">
+          <div>
+            <p class="eyebrow">Line items</p>
+            <h2>Description of Goods</h2>
+          </div>
+          <button class="primary-button compact" id="addItemTopButton" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Add item
+          </button>
+        </div>
+
+        <div class="table-frame">
+          <div class="table-scroll" tabindex="0" aria-label="Invoice items table. Scroll horizontally on small screens.">
+            <table class="items-table" id="itemsTable">
+              <caption class="sr-only">Invoice goods and services</caption>
+              <thead>
+                <tr>
+                  <th scope="col" class="col-number">S.No.</th>
+                  <th scope="col" class="col-description">Description of Goods</th>
+                  <th scope="col">HSN/SAC</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Unit</th>
+                  <th scope="col">Rate (₹)</th>
+                  <th scope="col">Amount (₹)</th>
+                  <th scope="col" class="col-action">Action</th>
+                </tr>
+              </thead>
+              <tbody id="itemsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="finance-grid invoice-section">
+        <div class="finance-left">
+          <div class="summary-block">
+            <span class="section-kicker">Amount chargeable (in words)</span>
+            <p class="amount-words" id="amountWords">Rupees Zero Only</p>
+          </div>
+
+          <details class="detail-disclosure" open>
+            <summary>Bank account details</summary>
+            <div class="form-grid two-columns detail-content">
+              <label class="floating-field"><span>Bank name</span><input data-field="bankName" placeholder="Bank name"></label>
+              <label class="floating-field"><span>Account number</span><input data-field="accountNo" inputmode="numeric" placeholder="Account number"></label>
+              <label class="floating-field"><span>Account name</span><input data-field="accountName" value="Sri Sawdamman Infra"></label>
+              <label class="floating-field"><span>IFSC code</span><input data-field="ifsc" autocapitalize="characters" spellcheck="false" placeholder="IFSC code"></label>
+              <label class="floating-field"><span>Branch</span><input data-field="branch" placeholder="Branch"></label>
+              <label class="floating-field"><span>UPI ID</span><input data-field="upi" placeholder="Optional UPI ID"></label>
+            </div>
+          </details>
+
+          <details class="detail-disclosure">
+            <summary>Declaration and jurisdiction</summary>
+            <div class="detail-content">
+              <label class="floating-field">
+                <span>Declaration</span>
+                <textarea data-field="declaration" rows="4">We declare that this invoice shows the actual price of the goods and services described and that all particulars are true and correct.</textarea>
+              </label>
+              <label class="floating-field">
+                <span>Jurisdiction</span>
+                <input data-field="jurisdiction" value="Subject to Dindigul Jurisdiction">
+              </label>
+            </div>
+          </details>
+        </div>
+
+        <aside class="totals-card" aria-label="Invoice totals">
+          <div class="totals-settings">
+            <label>
+              <span>Tax mode</span>
+              <select data-field="taxMode" id="taxModeSelect">
+                <option value="intra">CGST + SGST</option>
+                <option value="inter">IGST</option>
+                <option value="none">No GST</option>
+              </select>
+            </label>
+            <label>
+              <span>GST rate</span>
+              <select data-field="gstRate" id="gstRateSelect">
+                <option value="0">0%</option>
+                <option value="5">5%</option>
+                <option value="12">12%</option>
+                <option value="18" selected>18%</option>
+                <option value="28">28%</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="total-row"><span>Subtotal</span><strong id="subtotalValue">₹0.00</strong></div>
+          <div class="total-row input-total-row">
+            <label for="discountInput">Discount</label>
+            <span class="inline-number"><input data-field="discountRate" id="discountInput" type="number" min="0" max="100" step="0.01" value="0"><b>%</b></span>
+            <strong id="discountValue">− ₹0.00</strong>
+          </div>
+          <div class="total-row input-total-row">
+            <label for="otherChargeInput">Other charges</label>
+            <span class="inline-number currency-input"><b>₹</b><input data-field="otherCharges" id="otherChargeInput" type="number" min="0" step="0.01" value="0"></span>
+            <strong id="otherChargesValue">₹0.00</strong>
+          </div>
+          <div class="total-row"><span>Taxable value</span><strong id="taxableValue">₹0.00</strong></div>
+          <div class="total-row tax-output" id="cgstRow"><span>CGST <small id="cgstRateLabel">9%</small></span><strong id="cgstValue">₹0.00</strong></div>
+          <div class="total-row tax-output" id="sgstRow"><span>SGST <small id="sgstRateLabel">9%</small></span><strong id="sgstValue">₹0.00</strong></div>
+          <div class="total-row tax-output" id="igstRow" hidden><span>IGST <small id="igstRateLabel">18%</small></span><strong id="igstValue">₹0.00</strong></div>
+          <label class="round-toggle">
+            <input data-field="roundOffEnabled" id="roundOffInput" type="checkbox" checked>
+            <span>Round off final total</span>
+            <strong id="roundOffValue">₹0.00</strong>
+          </label>
+          <div class="grand-total-row"><span>Net Total</span><strong id="netTotalValue">₹0.00</strong></div>
+        </aside>
+      </section>
+
+      <section class="signature-grid invoice-section">
+        <div class="signature-box">
+          <span>Customer's Seal and Signature</span>
+          <div>Customer Signature</div>
+        </div>
+        <div class="signature-box">
+          <span id="signatureCompany">For Sri Sawdamman Infra</span>
+          <div>Authorised Signatory</div>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <nav class="action-dock" aria-label="Invoice actions">
+    <button class="dock-button" id="addItemButton" type="button">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      <span>Add</span>
+    </button>
+    <button class="dock-button" id="saveInvoiceButton" type="button">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 3h12l2 2v16H5Z"/><path d="M8 3v6h8V3M8 21v-8h8v8"/></svg>
+      <span>Save</span>
+    </button>
+    <button class="dock-button" id="shareButton" type="button">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.7 6.8-4.4m-6.8 7 6.8 4.4"/></svg>
+      <span>Share</span>
+    </button>
+    <button class="dock-button dock-primary" id="pdfButton" type="button">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6Z"/><path d="M14 3v4h4M9 13h6m-3-3v6"/></svg>
+      <span>PDF</span>
+    </button>
+    <button class="dock-button" id="printButton" type="button">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 9V3h10v6M7 18H5a2 2 0 0 1-2-2v-5h18v5a2 2 0 0 1-2 2h-2"/><path d="M7 15h10v6H7Z"/></svg>
+      <span>Print</span>
+    </button>
+    <button class="dock-button dock-more" id="moreButton" type="button" aria-expanded="false" aria-controls="moreMenu">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+      <span>More</span>
+    </button>
+    <div class="more-menu" id="moreMenu" hidden>
+      <button id="exportButton" type="button">Export backup</button>
+      <button id="importButton" type="button">Import backup</button>
+      <button id="clearButton" type="button" class="danger-text">Clear invoice</button>
+    </div>
+  </nav>
+
+  <input id="importFileInput" type="file" accept="application/json,.json" hidden>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true">
+    <span id="toastMessage"></span>
+    <button id="toastAction" type="button" hidden>Undo</button>
+  </div>
+
+  <div class="modal-backdrop" id="historyModal" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+      <header class="modal-header">
+        <div>
+          <p class="eyebrow">Saved locally</p>
+          <h2 id="historyTitle">Invoice history</h2>
+        </div>
+        <button class="icon-button modal-close" type="button" data-close-modal="historyModal" aria-label="Close history">×</button>
+      </header>
+      <div class="history-list" id="historyList"></div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="confirmModal" hidden>
+    <section class="modal-card confirm-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <header class="modal-header">
+        <div>
+          <p class="eyebrow">Please confirm</p>
+          <h2 id="confirmTitle">Continue?</h2>
+        </div>
+      </header>
+      <p id="confirmMessage">This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="soft-button" id="confirmCancelButton" type="button">Cancel</button>
+        <button class="primary-button danger-button" id="confirmAcceptButton" type="button">Continue</button>
+      </div>
+    </section>
+  </div>
+
+  <section id="printSheet" aria-hidden="true"></section>
+
+  <datalist id="unitOptions">
+    <option value="Nos"></option>
+    <option value="Sq.ft"></option>
+    <option value="Sq.m"></option>
+    <option value="Cft"></option>
+    <option value="Kg"></option>
+    <option value="Ton"></option>
+    <option value="Load"></option>
+    <option value="Job"></option>
+  </datalist>
+</body>
+</html>
